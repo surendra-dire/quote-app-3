@@ -15,13 +15,23 @@ sudo systemctl enable mysql
 Root password setup   
 Switch MySQL from "system-login" to "password-login" (setting the password to root) so your Spring Boot app can connect. FLUSH PRIVILEGES saves these changes, and EXIT closes the database prompt  
 
+sudo mysql
+CREATE USER 'admin'@'%' IDENTIFIED WITH mysql_native_password BY 'admin';
+GRANT ALL PRIVILEGES ON quotes_app.* TO 'admin'@'%';
+FLUSH PRIVILEGES;
+
+SELECT user, host FROM mysql.user WHERE user='admin';
+
+
+
 sudo mysql  
 ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';  
+ALTER USER 'root'@'54.221.110.158' IDENTIFIED WITH mysql_native_password BY 'root'; 
 FLUSH PRIVILEGES;  
 EXIT;  
 
 Create database and tables  
-mysql -u root -p  
+mysql -u admin -p  
 CREATE DATABASE quotes_app;  
 USE quotes_app;  
 
@@ -55,8 +65,45 @@ git clone https://github.com/surendra-dire/quote-app-3.git
 
 **BACKEND**:   
 
-1. Create database credentials in AWS Secrets Manager.    
-2. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).
+1. Install runtime for backend
+sudo apt update
+sudo apt install -y \
+  openjdk-17-jdk \
+  maven \
+  nodejs \
+  npm \
+  nginx
+
+sudo systemctl restart nginx    
+sudo systemctl enable nginx  
+
+2. 
+3. dd
+4. Create database credentials in AWS Secrets Manager.  
+   prod/quotes/db  
+
+{
+  "username": "admin",
+  "password": "admin",
+  "url": "jdbc:mysql://db-ip-adrdess:3306/quotes_app"
+}
+
+2. Create IAM role to access db credentials from secret manager
+   EC2-SecretManager_Role
+   Attach role to the EC2 machine where app is deployed. 
+
+3. 
+
+
+
+4. 
+   EC2_SecretManager_Role  
+   Attach role to the EC2 machine where app is deployed.  
+ 
+
+5. 
+6. 
+7. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).
      sudo vi /opt/quotes/load-secrets.sh   
 
         <pre style="color: orange;">
@@ -74,7 +121,7 @@ git clone https://github.com/surendra-dire/quote-app-3.git
         chmod +x /opt/quotes/load-secrets.sh  
         </pre>  
 
-3. Backend startup script
+8. Backend startup script
    sudo vi /opt/quotes/start-backend.sh
     <pre style="color: orange;">
         #!/bin/bash
