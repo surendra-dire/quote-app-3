@@ -12,25 +12,27 @@ sudo apt install -y mysql-server
 sudo systemctl start mysql  
 sudo systemctl enable mysql  
 
-**Allow Remote Connections**:  
+**Enable Remote Access**:  
 sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf  
 bind-address = 0.0.0.0
+sudo systemctl restart mysql
 
-**admin password setup**:  
-Switch MySQL from "system-login" to "password-login" (setting the password to root) so your Spring Boot app can connect. FLUSH PRIVILEGES saves these changes, and EXIT closes the database prompt  
+**Create DB + User**:  
+Switch MySQL from "system-login" to "password-login" (setting the password to root) so your Spring Boot app can connect. FLUSH PRIVILEGES saves these changes, and EXIT closes the database prompt.  
 
-sudo mysql
+sudo mysql  
+CREATE DATABASE quotes_app; 
+
 CREATE USER 'admin'@'%' IDENTIFIED WITH mysql_native_password BY 'admin';
 GRANT ALL PRIVILEGES ON quotes_app.* TO 'admin'@'%';
 FLUSH PRIVILEGES;
 EXIT;  
 
-sudo mysql  -u admin -p
+mysql -u admin -p
 SELECT user, host FROM mysql.user WHERE user='admin';
 
 **Create database, tables & data**:  
 mysql -u admin -p  
-CREATE DATABASE quotes_app;  
 USE quotes_app;  
 
 #Create Users Table  
@@ -136,15 +138,16 @@ sudo chown ubuntu:ubuntu /opt/quotes
 
 <pre style="color: orange;">
 #!/bin/bash
-echo "Fetching secrets from AWS..."
-# Fetching the JSON
-RAW_SECRETS=$(aws secretsmanager get-secret-value --secret-id prod/quotes/db --query SecretString --output text)
+set -e  
+echo "Fetching secrets from AWS..."  
+# Fetching the JSON  
+RAW_SECRETS=$(aws secretsmanager get-secret-value --secret-id prod/quotes/db --query SecretString --output text)  
 
-# Parsing individual keys
-export SPRING_DATASOURCE_URL=$(echo $RAW_SECRETS | jq -r .url)
-export SPRING_DATASOURCE_USERNAME=$(echo $RAW_SECRETS | jq -r .username)
-export SPRING_DATASOURCE_PASSWORD=$(echo $RAW_SECRETS | jq -r .password)
-</pre>
+# Parsing individual keys  
+export SPRING_DATASOURCE_URL=$(echo $RAW_SECRETS | jq -r .url)  
+export SPRING_DATASOURCE_USERNAME=$(echo $RAW_SECRETS | jq -r .username)  
+export SPRING_DATASOURCE_PASSWORD=$(echo $RAW_SECRETS | jq -r .password)  
+</pre>  
 
 chmod +x /opt/quotes/load-secrets.sh  
 
@@ -184,13 +187,17 @@ sudo chmod +x /opt/quotes/start-backend.sh
 sudo chmod +x /opt/quotes/load-secrets.sh  
 
 Run:  
-
+<pre style="color: orange;">
+    
 sudo systemctl daemon-reload  
 sudo systemctl enable quotes  
 sudo systemctl start quotes  
+    
+</pre>
 
 Check logs:  
 journalctl -u quotes -f  
+
 
 
 
