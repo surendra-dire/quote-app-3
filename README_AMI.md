@@ -1,4 +1,4 @@
-# ✍️ Provision an AMI  and scalling using scalling group   
+# ✍️ Provision an AMI  and scalling using scalling group    
 
 Deploy application using an AMI and setting up auto scalling group for scalling.      
 For simplicity, there is only one image is created for the backeed and frontend however it is recommondaed to create separate images for backend and frondend.     
