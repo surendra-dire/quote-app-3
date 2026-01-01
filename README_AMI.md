@@ -71,9 +71,6 @@ git clone https://github.com/surendra-dire/quote-app-3.git
         export SPRING_DATASOURCE_USERNAME=$(echo $RAW_SECRETS | jq -r .username)
         export SPRING_DATASOURCE_PASSWORD=$(echo $RAW_SECRETS | jq -r .password)
         
-        echo "Starting Application..."
-        # java -jar target/quotes-0.0.1-SNAPSHOT.jar
-
         chmod +x /opt/quotes/load-secrets.sh  
         </pre>  
 
@@ -87,16 +84,35 @@ git clone https://github.com/surendra-dire/quote-app-3.git
     </pre>
 
 
-
-
-
-
-
-
 ddd
 
-4. 
-5. 
+4.  Configure systemd service
+    sudo vi /etc/systemd/system/quotes.service
+
+     <pre style="color: orange;">
+        [Unit]
+        Description=Quotes Application
+        After=network.target
+        
+        [Service]
+        ExecStart=/opt/quotes/start-backend.sh
+        Restart=always
+        User=ubuntu
+        Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+        
+        [Install]
+        WantedBy=multi-user.target
+     </pre> 
+     
+      sudo systemctl daemon-reload
+      sudo systemctl enable quotes
+      sudo systemctl start quotes
+
+fffffff
+5.  
+6.  
+7.  
+8. 
    sudo vi /opt/quotes/start-backend.sh
 
 
@@ -105,14 +121,11 @@ ddd
 
 
 
-6. 
-7. 
-    Backend startup script
-8. 
-9. Secrets Manager loader script
+9. 
 10. 
+    Backend startup script
 11. 
-12. 
+12. Secrets Manager loader script
 13. 
 14. 
 15. 
@@ -123,12 +136,15 @@ ddd
 20. 
 21. 
 22. 
+23. 
+24. 
+25. 
   
-23.
-24. Create a jar file. mvn clean isntall   
-25. Create systemd service where call the initialize_variables.sh and run the backend.  
-26. Create systemd service (quote_systemd.service). This will be executed as soon as image is deployed or machine is rebooted.
-27. Create the image and save it. 
+26.
+27. Create a jar file. mvn clean isntall   
+28. Create systemd service where call the initialize_variables.sh and run the backend.  
+29. Create systemd service (quote_systemd.service). This will be executed as soon as image is deployed or machine is rebooted.
+30. Create the image and save it. 
 
 **FRONTEND**:
 Create build and configure nginx   
