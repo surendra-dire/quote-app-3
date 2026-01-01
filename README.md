@@ -107,9 +107,9 @@ npm start
 **Backend Deployment:**    
 A shell script (start.sh) is used to securely initialize backend configuration by fetching database credentials from AWS Secrets Manager. The script parses the secret JSON using jq, sets the required Spring Boot environment variables, and starts the application JAR.
 
-sudo apt install -y jq
-mvn clean install
-sudo vi start.sh  
+sudo apt install -y jq  
+mvn clean install  
+sudo vi load-secrets.sh    
 
 <pre style="color: orange;">
 #!/bin/bash
@@ -128,7 +128,7 @@ java -jar target/quotes-0.0.1-SNAPSHOT.jar
 
 </pre>  
 
-chmod +x start.sh  
+chmod +x load-secrets.sh  
  
 Verify manaully:  
 ./start.sh 
