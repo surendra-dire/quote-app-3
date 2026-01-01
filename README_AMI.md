@@ -12,25 +12,23 @@ sudo apt install -y mysql-server
 sudo systemctl start mysql  
 sudo systemctl enable mysql  
 
-Root password setup   
+**Allow Remote Connections**:  
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf  
+bind-address = 0.0.0.0
+
+**admin password setup**:  
 Switch MySQL from "system-login" to "password-login" (setting the password to root) so your Spring Boot app can connect. FLUSH PRIVILEGES saves these changes, and EXIT closes the database prompt  
 
 sudo mysql
 CREATE USER 'admin'@'%' IDENTIFIED WITH mysql_native_password BY 'admin';
 GRANT ALL PRIVILEGES ON quotes_app.* TO 'admin'@'%';
 FLUSH PRIVILEGES;
-
-SELECT user, host FROM mysql.user WHERE user='admin';
-
-
-
-sudo mysql  
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';  
-ALTER USER 'root'@'54.221.110.158' IDENTIFIED WITH mysql_native_password BY 'root'; 
-FLUSH PRIVILEGES;  
 EXIT;  
 
-Create database and tables  
+sudo mysql  -u admin -p
+SELECT user, host FROM mysql.user WHERE user='admin';
+
+**Create database, tables & data**:  
 mysql -u admin -p  
 CREATE DATABASE quotes_app;  
 USE quotes_app;  
@@ -56,6 +54,7 @@ CREATE TABLE quotes (
 #Insert Initial Data if needed for testing.   
 INSERT INTO users (username, name, password) VALUES ('test', 'Surendra', 'test');  
 INSERT INTO quotes (text, author, user_id) VALUES ('The only way to do great work is to love what you do.', 'Steve Jobs', 1); 
+EXIT;
 
 sudo systemctl restart mysql  
 sudo systemctl enable mysql 
@@ -104,11 +103,10 @@ sudo ./aws/install
    Attach role to the EC2 machine where app is deployed.   
 
 8. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).
-     sudo vi /opt/quotes/load-secrets.sh   
+   sudo vi /opt/quotes/load-secrets.sh   
 
 <pre style="color: orange;">
 #!/bin/bash
-
 echo "Fetching secrets from AWS..."
 # Fetching the JSON
 RAW_SECRETS=$(aws secretsmanager get-secret-value --secret-id prod/quotes/db --query SecretString --output text)
@@ -117,7 +115,6 @@ RAW_SECRETS=$(aws secretsmanager get-secret-value --secret-id prod/quotes/db --q
 export SPRING_DATASOURCE_URL=$(echo $RAW_SECRETS | jq -r .url)
 export SPRING_DATASOURCE_USERNAME=$(echo $RAW_SECRETS | jq -r .username)
 export SPRING_DATASOURCE_PASSWORD=$(echo $RAW_SECRETS | jq -r .password)
-
 </pre>
 
 chmod +x /opt/quotes/load-secrets.sh  
