@@ -1,0 +1,77 @@
+.quotes-page {
+  max-width: 900px;
+  margin: 30px auto;
+  font-family: Arial, sans-serif;
+}
+
+/* Top bar */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.logout-btn {
+  padding: 6px 12px;
+  background: #d9534f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Add quote */
+.add-quote {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.add-quote input {
+  flex: 1;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.add-quote button {
+  padding: 8px 16px;
+  background: #5cb85c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Table */
+.quotes-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.quotes-table th,
+.quotes-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.quotes-table th {
+  background: #f5f5f5;
+  font-weight: bold;
+}
+
+.actions span {
+  margin-right: 12px;
+  color: #0275d8;
+  cursor: pointer;
+}
+
+.actions span:hover {
+  text-decoration: underline;
+}
+
+.actions .delete {
+  color: #d9534f;
+}

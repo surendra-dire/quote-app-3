@@ -1,0 +1,76 @@
+/* Center the register card on the screen */
+.register-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f7f7f7;
+}
+
+/* The card container - matches your login-card exactly */
+.register-card {
+  background: #fff;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  text-align: center;
+}
+
+.register-card h2 {
+  margin-bottom: 30px;
+  color: #333;
+}
+
+/* Input field styling for Name, Username, and Password */
+.register-card input {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  box-sizing: border-box; /* Ensures padding doesn't make inputs wider than the card */
+}
+
+/* The Green Submit Button - matches your login-card button */
+.register-card button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  background-color: #4caf50; /* Green */
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.register-card button:hover {
+  background-color: #45a049;
+}
+
+/* Style for the blue link at the bottom */
+.register-footer {
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.back-to-login {
+  color: #007bff; /* Professional blue */
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.back-to-login:hover {
+  text-decoration: underline;
+}
+
+/* Error message styling */
+.error {
+  color: red;
+  margin-top: 10px;
+  font-size: 14px;
+}
