@@ -65,129 +65,102 @@ git clone https://github.com/surendra-dire/quote-app-3.git
 
 **BACKEND**:   
 
-1. Install runtime for backend
+1. Install tools and runtime for backend
 sudo apt update
-sudo apt install -y \
-  openjdk-17-jdk \
-  maven \
-  nodejs \
-  npm \
-  nginx
+sudo apt install -y \  
+  openjdk-17-jdk \  
+  maven \  
+  nodejs \  
+  npm \  
+  nginx \
+  jq  \
+  unzip  \
 
 sudo systemctl restart nginx    
-sudo systemctl enable nginx  
+sudo systemctl enable nginx 
 
-2. 
-3. dd
-4. Create database credentials in AWS Secrets Manager.  
+2. Install AWS cli
+sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+sudo apt update && sudo apt install -y unzip && unzip awscliv2.zip
+sudo ./aws/install
+  
+3. Create database credentials in AWS Secrets Manager.  
    prod/quotes/db  
+{  
+  "username": "admin",  
+  "password": "admin",  
+  "url": "jdbc:mysql://db-ip-adrdess:3306/quotes_app"   #change ip address  
+}  
 
-{
-  "username": "admin",
-  "password": "admin",
-  "url": "jdbc:mysql://db-ip-adrdess:3306/quotes_app"
-}
+4. Create S3 bucket to upload backened jar.  
+   s3-bucket-backend-jar  
+   
+5. Create Jar and upload into S3 bucket  
+   mvn clean package  
+   aws s3 cp target/quotes-0.0.1-SNAPSHOT.jar s3://s3-bucket-backend-jar/quotes-0.0.1-SNAPSHOT.jar
 
-2. Create IAM role to access db credentials from secret manager
-   EC2-SecretManager_Role
-   Attach role to the EC2 machine where app is deployed. 
+7. Create IAM role to access db credentials from secret manager and download the .jar from the s3 bciket.
+   EC2-SecretManager_S3_Role  
+   Attach role to the EC2 machine where app is deployed.   
 
-3. 
-
-
-
-4. 
-   EC2_SecretManager_Role  
-   Attach role to the EC2 machine where app is deployed.  
- 
-
-5. 
-6. 
-7. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).
+8. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).
      sudo vi /opt/quotes/load-secrets.sh   
 
-        <pre style="color: orange;">
-        #!/bin/bash
-        
-        echo "Fetching secrets from AWS..."
-        # Fetching the JSON
-        RAW_SECRETS=$(aws secretsmanager get-secret-value --secret-id prod/quotes/db --query SecretString --output text)
-        
-        # Parsing individual keys
-        export SPRING_DATASOURCE_URL=$(echo $RAW_SECRETS | jq -r .url)
-        export SPRING_DATASOURCE_USERNAME=$(echo $RAW_SECRETS | jq -r .username)
-        export SPRING_DATASOURCE_PASSWORD=$(echo $RAW_SECRETS | jq -r .password)
-        
-        chmod +x /opt/quotes/load-secrets.sh  
-        </pre>  
+<pre style="color: orange;">
+#!/bin/bash
+
+echo "Fetching secrets from AWS..."
+# Fetching the JSON
+RAW_SECRETS=$(aws secretsmanager get-secret-value --secret-id prod/quotes/db --query SecretString --output text)
+
+# Parsing individual keys
+export SPRING_DATASOURCE_URL=$(echo $RAW_SECRETS | jq -r .url)
+export SPRING_DATASOURCE_USERNAME=$(echo $RAW_SECRETS | jq -r .username)
+export SPRING_DATASOURCE_PASSWORD=$(echo $RAW_SECRETS | jq -r .password)
+
+</pre>
+
+chmod +x /opt/quotes/load-secrets.sh  
 
 8. Backend startup script
-   sudo vi /opt/quotes/start-backend.sh
-    <pre style="color: orange;">
-        #!/bin/bash
-        source /opt/quotes/load-secrets.sh
-        java -jar /opt/quotes/backend/target/quotes-0.0.1-SNAPSHOT.jar
-        sudo chmod +x /opt/quotes/start-backend.sh
-    </pre>
+sudo vi /opt/quotes/start-backend.sh
 
+<pre style="color: orange;">
+#!/bin/bash
+set -e
+source /opt/quotes/load-secrets.sh
+aws s3 cp s3://s3-bucket-backend-jar/quotes-0.0.1-SNAPSHOT.jar /opt/quotes/quotes-0.0.1-SNAPSHOT.jar
+exec java -jar /opt/quotes/quotes-0.0.1-SNAPSHOT.jar
+</pre>
 
-ddd
+sudo chmod +x /opt/quotes/start-backend.sh
 
-4.  Configure systemd service
-    sudo vi /etc/systemd/system/quotes.service
+9. Configure systemd service
+sudo vi /etc/systemd/system/quotes.service
 
-     <pre style="color: orange;">
-        [Unit]
-        Description=Quotes Application
-        After=network.target
-        
-        [Service]
-        ExecStart=/opt/quotes/start-backend.sh
-        Restart=always
-        User=ubuntu
-        Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-        
-        [Install]
-        WantedBy=multi-user.target
-     </pre> 
-     
-      sudo systemctl daemon-reload
-      sudo systemctl enable quotes
-      sudo systemctl start quotes
+<pre style="color: orange;">
+[Unit]
+Description=Quotes Application
+After=network.target
 
-fffffff
-5.  
-6.  
-7.  
-8. 
-   sudo vi /opt/quotes/start-backend.sh
+[Service]
+ExecStart=/opt/quotes/start-backend.sh
+Restart=always
+User=ubuntu
+Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
+[Install]
+WantedBy=multi-user.target
+</pre> 
 
+sudo chown -R ubuntu:ubuntu /opt/quotes  
+sudo chmod +x /opt/quotes/start-backend.sh  
+sudo chmod +x /opt/quotes/load-secrets.sh  
 
-
-
-
-
-9. 
-10. 
-    Backend startup script
-11. 
-12. Secrets Manager loader script
-13. 
-14. 
-15. 
-16. 
-17. 
-18. 
-19. 
-20. 
-21. 
-22. 
-23. 
-24. 
-25. 
-  
-26.
+sudo systemctl daemon-reload  
+sudo systemctl enable quotes  
+sudo systemctl start quotes  
+.
 27. Create a jar file. mvn clean isntall   
 28. Create systemd service where call the initialize_variables.sh and run the backend.  
 29. Create systemd service (quote_systemd.service). This will be executed as soon as image is deployed or machine is rebooted.
