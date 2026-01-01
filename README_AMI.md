@@ -56,11 +56,79 @@ git clone https://github.com/surendra-dire/quote-app-3.git
 **BACKEND**:   
 
 1. Create database credentials in AWS Secrets Manager.    
-2. Create shell script that will fatch the database credentials and available them via env variables (initialize_variables.sh).  
-3. Create a jar file. mvn clean isntall   
-4. Create systemd service where call the initialize_variables.sh and run the backend.  
-5. Create systemd service (quote_systemd.service). This will be executed as soon as image is deployed or machine is rebooted.
-6. Create the image and save it. 
+2. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).
+     sudo vi /opt/quotes/load-secrets.sh   
+
+        <pre style="color: orange;">
+        #!/bin/bash
+        
+        echo "Fetching secrets from AWS..."
+        # Fetching the JSON
+        RAW_SECRETS=$(aws secretsmanager get-secret-value --secret-id prod/quotes/db --query SecretString --output text)
+        
+        # Parsing individual keys
+        export SPRING_DATASOURCE_URL=$(echo $RAW_SECRETS | jq -r .url)
+        export SPRING_DATASOURCE_USERNAME=$(echo $RAW_SECRETS | jq -r .username)
+        export SPRING_DATASOURCE_PASSWORD=$(echo $RAW_SECRETS | jq -r .password)
+        
+        echo "Starting Application..."
+        # java -jar target/quotes-0.0.1-SNAPSHOT.jar
+
+        chmod +x /opt/quotes/load-secrets.sh  
+        </pre>  
+
+3. Backend startup script
+   sudo vi /opt/quotes/start-backend.sh
+    <pre style="color: orange;">
+        #!/bin/bash
+        source /opt/quotes/load-secrets.sh
+        java -jar /opt/quotes/backend/target/quotes-0.0.1-SNAPSHOT.jar
+        sudo chmod +x /opt/quotes/start-backend.sh
+    </pre>
+
+
+
+
+
+
+
+
+ddd
+
+4. 
+5. 
+   sudo vi /opt/quotes/start-backend.sh
+
+
+
+
+
+
+
+6. 
+7. 
+    Backend startup script
+8. 
+9. Secrets Manager loader script
+10. 
+11. 
+12. 
+13. 
+14. 
+15. 
+16. 
+17. 
+18. 
+19. 
+20. 
+21. 
+22. 
+  
+23.
+24. Create a jar file. mvn clean isntall   
+25. Create systemd service where call the initialize_variables.sh and run the backend.  
+26. Create systemd service (quote_systemd.service). This will be executed as soon as image is deployed or machine is rebooted.
+27. Create the image and save it. 
 
 **FRONTEND**:
 Create build and configure nginx   
