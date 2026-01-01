@@ -19,15 +19,14 @@ git clone https://github.com/surendra-dire/quote-app-3.git
 
 **FRONTEND**:
 
-### 2. Provision another AWS EC2 isntance (EC2 medium with 20 GB LBS) on which AMI will be deployed.
+Provision another AWS EC2 isntance (EC2 medium with 20 GB LBS) on which AMI will be deployed.
 **SETUP DATABASE**:  
-sudo apt update && sudo apt install -y \
-
+sudo apt update  
 sudo apt install -y mysql-server  
 sudo systemctl start mysql  
 sudo systemctl enable mysql  
 
-### Root password setup
+Root password setup   
 Switch MySQL from "system-login" to "password-login" (setting the password to root) so your Spring Boot app can connect. FLUSH PRIVILEGES saves these changes, and EXIT closes the database prompt  
 
 sudo mysql  
@@ -35,12 +34,12 @@ ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
 FLUSH PRIVILEGES;  
 EXIT;  
 
-### Create database and tables  
+Create database and tables  
 mysql -u root -p  
 CREATE DATABASE quotes_app;  
 USE quotes_app;  
 
--- Create Users Table  
+#Create Users Table  
 CREATE TABLE users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -48,7 +47,7 @@ CREATE TABLE users (
     password VARCHAR(100)
 );
 
--- Create Quotes Table  
+#Create Quotes Table  
 CREATE TABLE quotes (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     text VARCHAR(255),
@@ -58,9 +57,11 @@ CREATE TABLE quotes (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Insert Initial Data  
-INSERT INTO users (username, name, password) VALUES ('test', 'test', 'test');  
-INSERT INTO quotes (text, author, user_id) VALUES ('The only way to do great work is to love what you do.', 'Steve Jobs', 1);  
+#Insert Initial Data if needed for testing.   
+INSERT INTO users (username, name, password) VALUES ('test', 'Surendra', 'test');  
+INSERT INTO quotes (text, author, user_id) VALUES ('The only way to do great work is to love what you do.', 'Steve Jobs', 1); 
+
+
 
 # 🚀 **Getting started**
 
