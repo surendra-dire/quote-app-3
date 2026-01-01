@@ -128,11 +128,11 @@ sudo ./aws/install
     }
   ]
 }
-</pre>
+</pre>  
 
-7.Create app directory
-sudo mkdir -p /opt/quotes
-sudo chown ubuntu:ubuntu /opt/quotes
+7.Create app directory  
+sudo mkdir -p /opt/quotes  
+sudo chown ubuntu:ubuntu /opt/quotes  
 
 8. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).  
 sudo vi /opt/quotes/load-secrets.sh   
