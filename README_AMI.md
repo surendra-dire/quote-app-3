@@ -59,10 +59,13 @@ EXIT;
 sudo systemctl restart mysql  
 sudo systemctl enable mysql 
 
+**Open port 3306**: 
+ Update security group.  
+
 ### 2. Clone the code on another EC2 instance and deploy the application. 
 git clone https://github.com/surendra-dire/quote-app-3.git    
 
-**BACKEND**:   
+**BACKEND**:     
 
 1. Install tools and runtime for backend
 sudo apt update
@@ -85,11 +88,12 @@ sudo ./aws/install
   
 3. Create database credentials in AWS Secrets Manager.  
    prod/quotes/db  
-{  
-  "username": "admin",  
-  "password": "admin",  
-  "url": "jdbc:mysql://db-ip-adrdess:3306/quotes_app"   #change ip address  
-}  
+{
+  "username": "admin",
+  "password": "admin",
+  "url": "jdbc:mysql://<DB_PRIVATE_IP>:3306/quotes_app"
+}
+ 
 
 4. Create S3 bucket to upload backened jar.  
    s3-bucket-backend-jar  
@@ -100,9 +104,34 @@ sudo ./aws/install
 
 7. Create IAM role to access db credentials from secret manager and download the .jar from the s3 bciket.
    EC2-SecretManager_S3_Role  
-   Attach role to the EC2 machine where app is deployed.   
+   Attach role to the EC2 machine where app is deployed.
+<pre style="color: orange;">
+   {
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "arn:aws:secretsmanager:*:*:secret:prod/quotes/db*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject"
+      ],
+      "Resource": "arn:aws:s3:::s3-bucket-backend-jar/*"
+    }
+  ]
+}
+</pre>
 
-8. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).
+9.Create app directory
+sudo mkdir -p /opt/quotes
+sudo chown ubuntu:ubuntu /opt/quotes
+
+10. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).
    sudo vi /opt/quotes/load-secrets.sh   
 
 <pre style="color: orange;">
@@ -154,16 +183,24 @@ sudo chown -R ubuntu:ubuntu /opt/quotes
 sudo chmod +x /opt/quotes/start-backend.sh  
 sudo chmod +x /opt/quotes/load-secrets.sh  
 
+Run:  
+
 sudo systemctl daemon-reload  
 sudo systemctl enable quotes  
 sudo systemctl start quotes  
-.
+
+Check logs:  
+journalctl -u quotes -f  
+
+
+
+
 27. Create a jar file. mvn clean isntall   
 28. Create systemd service where call the initialize_variables.sh and run the backend.  
 29. Create systemd service (quote_systemd.service). This will be executed as soon as image is deployed or machine is rebooted.
 30. Create the image and save it. 
 
-**FRONTEND**:
+**FRONTEND**:  
 Create build and configure nginx   
 
 npm run build  
