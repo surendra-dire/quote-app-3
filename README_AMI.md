@@ -14,11 +14,12 @@ sudo systemctl enable mysql
 
 **Enable Remote Access**:  
 sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf  
-bind-address = 0.0.0.0
-sudo systemctl restart mysql
+bind-address = 0.0.0.0  
+sudo systemctl restart mysql  
 
 **Create DB + User**:  
-Switch MySQL from "system-login" to "password-login" (setting the password to root) so your Spring Boot app can connect. FLUSH PRIVILEGES saves these changes, and EXIT closes the database prompt.  
+Create a dedicated DB user (admin) for the application and allow remote access.   
+#Switch MySQL from "system-login" to "password-login" (setting the password to root) so your Spring Boot app can connect. FLUSH PRIVILEGES saves these changes, and EXIT closes the database prompt.  
 
 sudo mysql  
 CREATE DATABASE quotes_app; 
@@ -28,8 +29,8 @@ GRANT ALL PRIVILEGES ON quotes_app.* TO 'admin'@'%';
 FLUSH PRIVILEGES;
 EXIT;  
 
-mysql -u admin -p
-SELECT user, host FROM mysql.user WHERE user='admin';
+mysql -u admin -p  
+SELECT user, host FROM mysql.user WHERE user='admin';  
 
 **Create database, tables & data**:  
 mysql -u admin -p  
@@ -133,20 +134,20 @@ sudo ./aws/install
 sudo mkdir -p /opt/quotes
 sudo chown ubuntu:ubuntu /opt/quotes
 
-10. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).
-   sudo vi /opt/quotes/load-secrets.sh   
+10. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).  
+sudo vi /opt/quotes/load-secrets.sh   
 
 <pre style="color: orange;">
 #!/bin/bash
 set -e  
-echo "Fetching secrets from AWS..."  
+echo "Fetching secrets from AWS"   
 # Fetching the JSON  
 RAW_SECRETS=$(aws secretsmanager get-secret-value --secret-id prod/quotes/db --query SecretString --output text)  
 
 # Parsing individual keys  
-export SPRING_DATASOURCE_URL=$(echo $RAW_SECRETS | jq -r .url)  
-export SPRING_DATASOURCE_USERNAME=$(echo $RAW_SECRETS | jq -r .username)  
-export SPRING_DATASOURCE_PASSWORD=$(echo $RAW_SECRETS | jq -r .password)  
+export SPRING_DATASOURCE_URL=$(echo "$RAW_SECRETS" | jq -r .url)
+export SPRING_DATASOURCE_USERNAME=$(echo "$RAW_SECRETS" | jq -r .username)
+export SPRING_DATASOURCE_PASSWORD=$(echo "$RAW_SECRETS" | jq -r .password) 
 </pre>  
 
 chmod +x /opt/quotes/load-secrets.sh  
@@ -154,18 +155,18 @@ chmod +x /opt/quotes/load-secrets.sh
 8. Backend startup script
 sudo vi /opt/quotes/start-backend.sh
 
-<pre style="color: orange;">
+<pre style="color: orange;">  
 #!/bin/bash
 set -e
-source /opt/quotes/load-secrets.sh
-aws s3 cp s3://s3-bucket-backend-jar/quotes-0.0.1-SNAPSHOT.jar /opt/quotes/quotes-0.0.1-SNAPSHOT.jar
-exec java -jar /opt/quotes/quotes-0.0.1-SNAPSHOT.jar
-</pre>
+source /opt/quotes/load-secrets.sh  
+aws s3 cp s3://s3-bucket-backend-jar/quotes-0.0.1-SNAPSHOT.jar /opt/quotes/quotes-0.0.1-SNAPSHOT.jar  
+exec java -jar /opt/quotes/quotes-0.0.1-SNAPSHOT.jar  
+</pre>  
 
-sudo chmod +x /opt/quotes/start-backend.sh
+chmod +x /opt/quotes/start-backend.sh
 
-9. Configure systemd service
-sudo vi /etc/systemd/system/quotes.service
+9. Configure systemd service  
+sudo vi /etc/systemd/system/quotes.service  
 
 <pre style="color: orange;">
 [Unit]
