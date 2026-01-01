@@ -96,15 +96,10 @@ sudo ./aws/install
   "url": "jdbc:mysql://<DB_PRIVATE_IP>:3306/quotes_app"  
 }  
  
-
 4. Create S3 bucket to upload backened jar.  
    s3-bucket-backend-jar  
    
-5. Create Jar and upload into S3 bucket  
-   mvn clean package  
-   aws s3 cp target/quotes-0.0.1-SNAPSHOT.jar s3://s3-bucket-backend-jar/quotes-0.0.1-SNAPSHOT.jar  
-
-6. Create IAM role to access db credentials from secret manager and download the .jar from the s3 bciket.  
+5. Create IAM role to access db credentials from secret manager and download the .jar from the s3 bciket.  
    EC2-SecretManager_S3_Role  
    Attach role to the EC2 machine where app is deployed.
 <pre style="color: orange;">
@@ -129,7 +124,11 @@ sudo ./aws/install
 }
 </pre>  
 
-7.Create app directory  
+7.Create Jar and upload into S3 bucket  
+   mvn clean package  
+   aws s3 cp target/quotes-0.0.1-SNAPSHOT.jar s3://s3-bucket-backend-jar/quotes-0.0.1-SNAPSHOT.jar
+   
+8.Create app directory  
 sudo mkdir -p /opt/quotes  
 sudo chown ubuntu:ubuntu /opt/quotes  
 
@@ -149,7 +148,7 @@ export SPRING_DATASOURCE_USERNAME=$(echo "$RAW_SECRETS" | jq -r .username)
 export SPRING_DATASOURCE_PASSWORD=$(echo "$RAW_SECRETS" | jq -r .password) 
 </pre>  
 
-chmod +x /opt/quotes/load-secrets.sh  
+sudo chmod +x /opt/quotes/load-secrets.sh  
 
 9.Backend startup script
 sudo vi /opt/quotes/start-backend.sh
