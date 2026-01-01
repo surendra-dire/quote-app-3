@@ -1,25 +1,9 @@
 # ✍️ Create an AMI - Deploy application using an AMI and setting up auto scalling group for scalling.  
 For simplicity, there is only one image is created for the backed and frontend however it is recommondaed to create separate images for backend and frondend.   
 
-### 1. First provision AWS EC2 isntance (EC2 medium with 20 GB LBS) and install all the runtimes.  
-sudo apt update && sudo apt install -y mysql-server  
-sudo systemctl start mysql  
-sudo systemctl enable mysql 
+### 1. Prepare Database server first
+Provision a separate AWS EC2 isntance and install and configure the MySQL database.
 
-### 2. Clone the code on EC2 and deploy  
-git clone https://github.com/surendra-dire/quote-app-3.git    
-
-**BACKEND**:   
-1. Create database credentials in AWS Secrets Manager.    
-2. Create shell script that will fatch the database credentials and available them via env variables (initialize_variables.sh).  
-3. Create a jar file. mvn clean isntall   
-4. Create systemd service where call the initialize_variables.sh and run the backend.  
-5. Create systemd service (quote_systemd.service). This will be executed as soon as image is deployed or machine is rebooted.
-6. Create the image and save it. 
-
-**FRONTEND**:
-
-Provision another AWS EC2 isntance (EC2 medium with 20 GB LBS) on which AMI will be deployed.
 **SETUP DATABASE**:  
 sudo apt update  
 sudo apt install -y mysql-server  
@@ -61,96 +45,22 @@ CREATE TABLE quotes (
 INSERT INTO users (username, name, password) VALUES ('test', 'Surendra', 'test');  
 INSERT INTO quotes (text, author, user_id) VALUES ('The only way to do great work is to love what you do.', 'Steve Jobs', 1); 
 
+sudo systemctl restart mysql  
+sudo systemctl enable mysql 
 
+### 2. Clone the code on another EC2 instance and deploy the application. 
+git clone https://github.com/surendra-dire/quote-app-3.git    
 
-# 🚀 **Getting started**
+**BACKEND**:   
+1. Create database credentials in AWS Secrets Manager.    
+2. Create shell script that will fatch the database credentials and available them via env variables (initialize_variables.sh).  
+3. Create a jar file. mvn clean isntall   
+4. Create systemd service where call the initialize_variables.sh and run the backend.  
+5. Create systemd service (quote_systemd.service). This will be executed as soon as image is deployed or machine is rebooted.
+6. Create the image and save it. 
 
-**Deploy Locally:** 
-
-Permissions  
-Ensure the current user owns the project directory so you don't run into "Permission Denied" errors:  
-sudo chown -R $USER:$USER /home/ubuntu/quote-app 
-
-Navigate to your backend and run:  
-mvn clean install  
-mvn spring-boot:run  
-
-Verify user can be created :  
-
-✅ Register a user  
-curl -X POST http://localhost:8080/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"123","name":"Test User"}'
-
-🧪 Login Test  
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"123"}'
-
-Add Quote for user ID = 1  
-curl http://localhost:8080/api/quotes/1  
-
-curl -X POST http://localhost:8080/api/quotes/1 \
-  -H "Content-Type: application/json" \
-  -d '{"text":"Stay hungry, stay foolish","author":"Steve Jobs"}'  
-
-  
-🚀 Summary
-Action	URL
-Register user	POST /api/auth/register
-Login user	    POST /api/auth/login
-Get quotes	    GET /api/quotes/{userId}
-Add quote	    POST /api/quotes/{userId}
-Update quote	PUT /api/quotes/{id}
-Delete quote	DELETE /api/quotes/{id}
-
-
-Navigate to your frontend directory and run:  
-npm install  
-npm start  
-
-**Deploy in Porduction:**  
-
-**Backend Deployment:**    
-A shell script (start.sh) is used to securely initialize backend configuration by fetching database credentials from AWS Secrets Manager. The script parses the secret JSON using jq, sets the required Spring Boot environment variables, and starts the application JAR.
-
-sudo apt install -y jq
-mvn clean install
-sudo vi start.sh  
-
-<pre style="color: orange;">
-#!/bin/bash
-
-echo "Fetching secrets from AWS..."
-# Fetching the JSON
-RAW_SECRETS=$(aws secretsmanager get-secret-value --secret-id prod/quotes/db --query SecretString --output text)
-
-# Parsing individual keys
-export SPRING_DATASOURCE_URL=$(echo $RAW_SECRETS | jq -r .url)
-export SPRING_DATASOURCE_USERNAME=$(echo $RAW_SECRETS | jq -r .username)
-export SPRING_DATASOURCE_PASSWORD=$(echo $RAW_SECRETS | jq -r .password)
-
-echo "Starting Application..."
-java -jar target/quotes-0.0.1-SNAPSHOT.jar
-
-</pre>  
-
-chmod +x start.sh  
- 
-Verify manaully:  
-./start.sh 
-
-RAW_SECRETS=$(aws secretsmanager get-secret-value --secret-id prod/quotes/db --query SecretString --output text)  
-
-MY_USER=$(aws secretsmanager get-secret-value --secret-id prod/quotes/db --query SecretString --output text | jq -r .username)  
-echo $MY_USER  
-
-**Frontend Deployment:**   
-Install Nginx, move your build folder to /var/www/html, and restart the Nginx service to host the site.  
-
-sudo apt install -y nginx  
-systemctl start nginx  
-systemctl enable nginx   
+**FRONTEND**:
+Create build and configure nginx   
 
 npm run build  
 sudo mkdir /var/www/react/  
@@ -189,17 +99,9 @@ server {
     error_page 404 /index.html;
 }
 </pre>
-  
-  
+    
 sudo nginx -t  
 sudo systemctl restart nginx   
 sudo systemctl enable nginx   
 
-
-
-### Troubleshoot commands:   
-sudo ufw allow 8080  
-sudo netstat -tulpn | grep 8080  
-sudo systemctl status mysql  
-sudo kill -9 $(sudo lsof -t -i:8080) or sudo ss -lptn 'sport = :8080'  
 
