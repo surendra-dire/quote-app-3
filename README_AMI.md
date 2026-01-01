@@ -1,8 +1,10 @@
-# ✍️ Create an AMI - Deploy application using an AMI and setting up auto scalling group for scalling.  
-For simplicity, there is only one image is created for the backed and frontend however it is recommondaed to create separate images for backend and frondend.   
+# ✍️ Provision an AMI  and scalling using scalling group   
 
-### 1. Prepare Database server first
-Provision a separate AWS EC2 isntance and install and configure the MySQL database.
+Deploy application using an AMI and setting up auto scalling group for scalling.      
+For simplicity, there is only one image is created for the backeed and frontend however it is recommondaed to create separate images for backend and frondend.     
+
+### 1. Prepare Database server first  
+Provision a separate AWS EC2 isntance and install and configure the MySQL database.    
 
 **SETUP DATABASE**:  
 sudo apt update  
@@ -52,6 +54,7 @@ sudo systemctl enable mysql
 git clone https://github.com/surendra-dire/quote-app-3.git    
 
 **BACKEND**:   
+
 1. Create database credentials in AWS Secrets Manager.    
 2. Create shell script that will fatch the database credentials and available them via env variables (initialize_variables.sh).  
 3. Create a jar file. mvn clean isntall   
