@@ -26,7 +26,7 @@ CREATE DATABASE quotes_app;
 
 CREATE USER 'admin'@'%' IDENTIFIED WITH mysql_native_password BY 'admin';
 GRANT ALL PRIVILEGES ON quotes_app.* TO 'admin'@'%';
-FLUSH PRIVILEGES;
+FLUSH PRIVILEGES;  
 EXIT;  
 
 mysql -u admin -p  
