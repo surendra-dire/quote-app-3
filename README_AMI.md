@@ -105,7 +105,7 @@ sudo ./aws/install
    mvn clean package  
    aws s3 cp target/quotes-0.0.1-SNAPSHOT.jar s3://s3-bucket-backend-jar/quotes-0.0.1-SNAPSHOT.jar
 
-7. Create IAM role to access db credentials from secret manager and download the .jar from the s3 bciket.
+6. Create IAM role to access db credentials from secret manager and download the .jar from the s3 bciket.
    EC2-SecretManager_S3_Role  
    Attach role to the EC2 machine where app is deployed.
 <pre style="color: orange;">
@@ -130,11 +130,11 @@ sudo ./aws/install
 }
 </pre>
 
-9.Create app directory
+7.Create app directory
 sudo mkdir -p /opt/quotes
 sudo chown ubuntu:ubuntu /opt/quotes
 
-10. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).  
+8. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).  
 sudo vi /opt/quotes/load-secrets.sh   
 
 <pre style="color: orange;">
@@ -152,7 +152,7 @@ export SPRING_DATASOURCE_PASSWORD=$(echo "$RAW_SECRETS" | jq -r .password)
 
 chmod +x /opt/quotes/load-secrets.sh  
 
-8. Backend startup script
+9. Backend startup script
 sudo vi /opt/quotes/start-backend.sh
 
 <pre style="color: orange;">  
@@ -165,7 +165,7 @@ exec java -jar /opt/quotes/quotes-0.0.1-SNAPSHOT.jar
 
 chmod +x /opt/quotes/start-backend.sh
 
-9. Configure systemd service  
+10. Configure systemd service  
 sudo vi /etc/systemd/system/quotes.service  
 
 <pre style="color: orange;">
@@ -189,11 +189,9 @@ sudo chmod +x /opt/quotes/load-secrets.sh
 
 Run:  
 <pre style="color: orange;">
-    
 sudo systemctl daemon-reload  
 sudo systemctl enable quotes  
 sudo systemctl start quotes  
-    
 </pre>
 
 Check logs:  
@@ -202,11 +200,6 @@ journalctl -u quotes -f
 
 
 
-
-27. Create a jar file. mvn clean isntall   
-28. Create systemd service where call the initialize_variables.sh and run the backend.  
-29. Create systemd service (quote_systemd.service). This will be executed as soon as image is deployed or machine is rebooted.
-30. Create the image and save it. 
 
 **FRONTEND**:  
 Create build and configure nginx   
