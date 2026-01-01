@@ -1,22 +1,28 @@
+# ✍️ Create an AMI - Deploy application using an AMI and setting up auto scalling group for scalling.  
+For simplicity, there is only one image is created for the backed and frontend however it is recommondaed to create separate images for backend and frondend.   
 
-# ✍️ Create AMI and autoscalling group.
-For simplicity, there is only one image got created for the backed and frontend.
+### 1. First provision AWS EC2 isntance (EC2 medium with 20 GB LBS) and install all the runtimes.  
+sudo apt update && sudo apt install -y mysql-server  
+sudo systemctl start mysql  
+sudo systemctl enable mysql 
 
-### Setup Environment 
-Provision an aws EC2 isntance and install all the runtimes.
+### 2. Clone the code on EC2 and deploy  
+git clone https://github.com/surendra-dire/quote-app-3.git    
 
-#### Install Java & Maven
-sudo apt update  
-sudo apt install -y openjdk-17-jdk maven  
-java -version  
-mvn -version  
+**BACKEND**:   
+1. Create database credentials in AWS Secrets Manager.    
+2. Create shell script that will fatch the database credentials and available them via env variables (initialize_variables.sh).  
+3. Create a jar file. mvn clean isntall   
+4. Create systemd service where call the initialize_variables.sh and run the backend.  
+5. Create systemd service (quote_systemd.service). This will be executed as soon as image is deployed or machine is rebooted.
+6. Create the image and save it. 
 
-### Install node js & npm  
-sudo apt install -y nodejs npm    
-node -v  
-npm -v  
+**FRONTEND**:
 
-### Install and Configure MySQL Server  
+### 2. Provision another AWS EC2 isntance (EC2 medium with 20 GB LBS) on which AMI will be deployed.
+**SETUP DATABASE**:  
+sudo apt update && sudo apt install -y \
+
 sudo apt install -y mysql-server  
 sudo systemctl start mysql  
 sudo systemctl enable mysql  
