@@ -29,9 +29,6 @@ GRANT ALL PRIVILEGES ON quotes_app.* TO 'admin'@'%';
 FLUSH PRIVILEGES;  
 EXIT;  
 
-mysql -u admin -p  
-SELECT user, host FROM mysql.user WHERE user='admin';  
-
 **Create database, tables & data**:  
 mysql -u admin -p  
 USE quotes_app;  
@@ -206,7 +203,8 @@ npm run build
 sudo mkdir /var/www/react/  
 sudo cp -r build/* /var/www/react/  
 
-configure nginx conf file:  /etc/nginx/sites-available/default   
+configure nginx conf file:   
+sudo vi /etc/nginx/sites-available/default     
 
 <pre style="color: orange;">
 server {
