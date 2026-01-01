@@ -134,7 +134,7 @@ sudo ./aws/install
 sudo mkdir -p /opt/quotes  
 sudo chown ubuntu:ubuntu /opt/quotes  
 
-8. Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).  
+8.Create shell script that will fatch the database credentials and available them via env variables (load-secrets.sh).  
 sudo vi /opt/quotes/load-secrets.sh   
 
 <pre style="color: orange;">
@@ -152,7 +152,7 @@ export SPRING_DATASOURCE_PASSWORD=$(echo "$RAW_SECRETS" | jq -r .password)
 
 chmod +x /opt/quotes/load-secrets.sh  
 
-9. Backend startup script
+9.Backend startup script
 sudo vi /opt/quotes/start-backend.sh
 
 <pre style="color: orange;">  
