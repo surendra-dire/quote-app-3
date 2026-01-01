@@ -70,9 +70,9 @@ git clone https://github.com/surendra-dire/quote-app-3.git
 
 **BACKEND**:     
 
-1. Install tools and runtime for backend
-sudo apt update
-sudo apt install -y \  
+1. Install tools and runtime for backend  
+sudo apt update  
+sudo apt install -y \    
   openjdk-17-jdk \  
   maven \  
   nodejs \  
