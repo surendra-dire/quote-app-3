@@ -102,9 +102,9 @@ sudo ./aws/install
    
 5. Create Jar and upload into S3 bucket  
    mvn clean package  
-   aws s3 cp target/quotes-0.0.1-SNAPSHOT.jar s3://s3-bucket-backend-jar/quotes-0.0.1-SNAPSHOT.jar
+   aws s3 cp target/quotes-0.0.1-SNAPSHOT.jar s3://s3-bucket-backend-jar/quotes-0.0.1-SNAPSHOT.jar  
 
-6. Create IAM role to access db credentials from secret manager and download the .jar from the s3 bciket.
+6. Create IAM role to access db credentials from secret manager and download the .jar from the s3 bciket.  
    EC2-SecretManager_S3_Role  
    Attach role to the EC2 machine where app is deployed.
 <pre style="color: orange;">
