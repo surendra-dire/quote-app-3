@@ -90,12 +90,12 @@ sudo apt update && sudo apt install -y unzip && unzip awscliv2.zip
 sudo ./aws/install
   
 3. Create database credentials in AWS Secrets Manager.  
-   prod/quotes/db  
-{
-  "username": "admin",
-  "password": "admin",
-  "url": "jdbc:mysql://<DB_PRIVATE_IP>:3306/quotes_app"
-}
+   prod/quotes/db   
+{  
+  "username": "admin",          
+  "password": "admin",          
+  "url": "jdbc:mysql://<DB_PRIVATE_IP>:3306/quotes_app"  
+}  
  
 
 4. Create S3 bucket to upload backened jar.  
